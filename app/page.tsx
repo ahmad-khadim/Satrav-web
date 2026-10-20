@@ -81,6 +81,13 @@ const services = [
   },
 ];
 
+// Liens du menu de navigation
+const liens = [
+  { href: "#apropos", texte: "À propos" },
+  { href: "#metiers", texte: "Services" },
+  { href: "#contact", texte: "Contact" },
+];
+
 /* Fait apparaître son contenu en douceur quand il entre à l'écran */
 function Reveal({
   children,
@@ -143,6 +150,7 @@ function Icone({ children }: { children: ReactNode }) {
 export default function Home() {
   const [actif, setActif] = useState<string>(services[0].id);
   const [defile, setDefile] = useState(false);
+  const [menuOuvert, setMenuOuvert] = useState(false);
   const minuteur = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -186,20 +194,82 @@ export default function Home() {
       {/* Navigation */}
       <header
         className={`fixed inset-x-0 top-0 z-30 transition-all duration-300 ${
-          defile ? "bg-blue-950/90 shadow-lg backdrop-blur" : "bg-transparent"
+          defile || menuOuvert ? "bg-blue-950/90 shadow-lg backdrop-blur" : "bg-transparent"
         }`}
       >
         <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 text-white">
           <a href="#accueil" className={`${titres.className} text-xl tracking-wide`}>
             SATRAV
           </a>
-          <a
-            href="#contact"
-            className="rounded-md bg-white px-5 py-2 text-sm font-medium text-blue-900 shadow-md transition duration-100 hover:bg-blue-50 active:translate-y-0.5 active:scale-95 active:shadow-none"
+
+          {/* Liens (ordinateur) */}
+          <div className="hidden items-center gap-8 md:flex">
+            <ul className="flex gap-8 text-sm">
+              {liens.map((l) => (
+                <li key={l.href}>
+                  <a href={l.href} className="text-blue-100 transition hover:text-white">
+                    {l.texte}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <a
+              href="#contact"
+              className="rounded-md bg-white px-5 py-2 text-sm font-medium text-blue-900 shadow-md transition duration-100 hover:bg-blue-50 active:translate-y-0.5 active:scale-95 active:shadow-none"
+            >
+              Nous contacter
+            </a>
+          </div>
+
+          {/* Bouton menu (téléphone) */}
+          <button
+            type="button"
+            onClick={() => setMenuOuvert((o) => !o)}
+            aria-expanded={menuOuvert}
+            aria-controls="menu-mobile"
+            aria-label={menuOuvert ? "Fermer le menu" : "Ouvrir le menu"}
+            className="flex h-10 w-10 items-center justify-center rounded-md transition hover:bg-white/10 md:hidden"
           >
-            Nous contacter
-          </a>
+            <svg
+              viewBox="0 0 24 24"
+              className="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              {menuOuvert ? (
+                <path d="M6 6l12 12M18 6L6 18" />
+              ) : (
+                <path d="M4 7h16M4 12h16M4 17h16" />
+              )}
+            </svg>
+          </button>
         </nav>
+
+        {/* Menu déroulant (téléphone) */}
+        <div
+          id="menu-mobile"
+          className={`overflow-hidden bg-blue-950/95 backdrop-blur transition-[max-height] duration-300 md:hidden ${
+            menuOuvert ? "max-h-80" : "max-h-0"
+          }`}
+        >
+          <ul className="flex flex-col px-6 pb-6 pt-2 text-white">
+            {liens.map((l) => (
+              <li key={l.href}>
+                <a
+                  href={l.href}
+                  onClick={() => setMenuOuvert(false)}
+                  tabIndex={menuOuvert ? 0 : -1}
+                  className="block border-b border-white/10 py-3 text-lg"
+                >
+                  {l.texte}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       </header>
 
       {/* Bandeau principal (raccourci) */}
